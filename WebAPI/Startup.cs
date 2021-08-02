@@ -1,9 +1,13 @@
 using Business.Abstract;
 using Business.Concrete;
+using DataAccess.Abstract;
+using DataAccess.Concrete;
+using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,7 +34,13 @@ namespace WebAPI
         {
 
             services.AddControllers();
+            services.AddSingleton<IUserBusiness, UserBusiness>();
+            
             services.AddSingleton<ITestService, TestManager >();
+
+            
+            services.AddEntityFrameworkNpgsql().AddDbContext<TestContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MyConnection")));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
