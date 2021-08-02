@@ -34,11 +34,9 @@ namespace WebAPI
         {
 
             services.AddControllers();
-            services.AddSingleton<IUserBusiness, UserBusiness>();
-            
-            services.AddSingleton<ITestService, TestManager >();
-
-            
+            services.AddScoped<IUserBusiness, UserBusiness>();
+            services.AddScoped<ITestService, TestManager >();
+            services.AddScoped<IRepository<User>, EfRepositoryBase<User>>();
             services.AddEntityFrameworkNpgsql().AddDbContext<TestContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MyConnection")));
 
             services.AddSwaggerGen(c =>

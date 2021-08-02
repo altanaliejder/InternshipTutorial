@@ -9,57 +9,76 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Concrete
 {
-    public class EfRepositoryBase<TEntity, TContext> : IRepository<TEntity>
-        where TContext:DbContext,new()
+    public class EfRepositoryBase<TEntity> : IRepository<TEntity>,IDisposable
         where TEntity:class,new()
     {
-        
+        private bool disposedValue;
+
+        TestContext _context;
+        public EfRepositoryBase(TestContext context)
+        {
+            _context = context;
+        }
+
         public void Add(TEntity entity)
         {
-            using (TContext context = new TContext())
-            {
-                var addedEntity = context.Entry(entity);
-                addedEntity.State = EntityState.Added;
-                context.SaveChanges();
-            }
+            var AddedEntity = _context.Entry(entity);
+            AddedEntity.State = EntityState.Added;
+            _context.SaveChanges();
+            
         }
 
         public void Delete(TEntity entity)
         {
-            using (TContext context = new TContext())
-            {
-                var deletedEntity = context.Entry(entity);
+                var deletedEntity = _context.Entry(entity);
                 deletedEntity.State = EntityState.Deleted;
-                context.SaveChanges();
-            }
+                _context.SaveChanges();
         }
 
         public TEntity Get(Expression<Func<TEntity, bool>> filter)
         {
-            using (TContext context = new TContext())
-            {
-                return context.Set<TEntity>().SingleOrDefault(filter);
-            }
+                return _context.Set<TEntity>().SingleOrDefault(filter);
         }
 
         public List<TEntity> getAll(Expression<Func<TEntity, bool>> filter = null)
         {
-            using (TContext context = new TContext())
-            {
+
+
                 return filter == null
-                    ? context.Set<TEntity>().ToList()
-                    : context.Set<TEntity>().Where(filter).ToList();
-            }
+                    ? _context.Set<TEntity>().ToList()
+                    : _context.Set<TEntity>().Where(filter).ToList();
+
         }
 
         public void Update(TEntity entity)
         {
-            using (TContext context = new TContext())
-            {
-                var updatedEntity = context.Entry(entity);
+                var updatedEntity = _context.Entry(entity);
                 updatedEntity.State = EntityState.Modified;
-                context.SaveChanges();
+                _context.SaveChanges();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
             }
+        }
+
+
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
