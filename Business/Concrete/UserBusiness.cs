@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using DataAccess.Abstract;
+using DataAccess.Concrete;
+using DataAccess.UnitOfWork;
 using Entities;
 using System;
 using System.Collections.Generic;
@@ -12,19 +14,25 @@ namespace Business.Concrete
     public class UserBusiness : IUserBusiness
     {
         IRepository<User> _repository;
+        EfUnitOfWork efUnitOfWork;
+        TestContext _context;
 
-        public UserBusiness(IRepository<User> repository)
+        public UserBusiness(IRepository<User> repository, TestContext context)
         {
             _repository = repository;
+            _context = context;
+            efUnitOfWork = new EfUnitOfWork(_context);
         }
         public void Add(User user)
         {
-            _repository.Add(user);
+            efUnitOfWork.GetRepository<User>().Add(user);
+            
         }
 
         public void Delete(User user)
         {
-            _repository.Delete(user);
+            efUnitOfWork.GetRepository<User>().Delete(user);
+            
         }
 
         public List<User> GetAll()
@@ -44,7 +52,22 @@ namespace Business.Concrete
 
         public void Update(User user)
         {
-            _repository.Update(user);
+            efUnitOfWork.GetRepository<User>().Update(user);
+            
+        }
+
+        public void TestUow()
+        {
+            User user1 = new User();
+            User user2 = new User();
+            user1.Name = "asssacd";
+            user2.Name = "ccvdad";
+            user2.Id = 1;
+
+            this.Add(user1);
+            this.Add(user2);
+            efUnitOfWork.SaveChanges();
+            
         }
     }
 }

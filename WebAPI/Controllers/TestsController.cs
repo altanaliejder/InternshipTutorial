@@ -54,5 +54,13 @@ namespace WebAPI.Controllers
             _userBusiness.Add(user);
             return Ok();
         }
+
+        [HttpGet("testuow")]
+
+        public IActionResult TestUow()
+        {
+            _userBusiness.TestUow();
+            return Ok();
+        }
     }
 }

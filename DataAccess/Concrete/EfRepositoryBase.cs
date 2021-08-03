@@ -1,4 +1,5 @@
 ﻿using DataAccess.Abstract;
+using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Concrete
 {
-    public class EfRepositoryBase<TEntity> : IRepository<TEntity>,IDisposable
-        where TEntity:class,new()
+    public class EfRepositoryBase<TEntity> : IRepository<TEntity>
+        where TEntity : class
     {
-        private bool disposedValue;
 
         TestContext _context;
         public EfRepositoryBase(TestContext context)
@@ -24,61 +24,39 @@ namespace DataAccess.Concrete
         {
             var AddedEntity = _context.Entry(entity);
             AddedEntity.State = EntityState.Added;
-            _context.SaveChanges();
-            
+           
+
         }
 
         public void Delete(TEntity entity)
         {
-                var deletedEntity = _context.Entry(entity);
-                deletedEntity.State = EntityState.Deleted;
-                _context.SaveChanges();
+            var deletedEntity = _context.Entry(entity);
+            deletedEntity.State = EntityState.Deleted;
+            
+
         }
 
         public TEntity Get(Expression<Func<TEntity, bool>> filter)
         {
-                return _context.Set<TEntity>().SingleOrDefault(filter);
+            return _context.Set<TEntity>().SingleOrDefault(filter);
         }
 
         public List<TEntity> getAll(Expression<Func<TEntity, bool>> filter = null)
         {
 
-
-                return filter == null
-                    ? _context.Set<TEntity>().ToList()
-                    : _context.Set<TEntity>().Where(filter).ToList();
+            return filter == null
+                ? _context.Set<TEntity>().ToList()
+                : _context.Set<TEntity>().Where(filter).ToList();
 
         }
 
         public void Update(TEntity entity)
         {
-                var updatedEntity = _context.Entry(entity);
-                updatedEntity.State = EntityState.Modified;
-                _context.SaveChanges();
+            var updatedEntity = _context.Entry(entity);
+            updatedEntity.State = EntityState.Modified;
+            
+
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    _context.Dispose();
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }
