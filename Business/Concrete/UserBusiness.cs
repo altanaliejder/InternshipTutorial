@@ -26,34 +26,35 @@ namespace Business.Concrete
         public void Add(User user)
         {
             efUnitOfWork.GetRepository<User>().Add(user);
+            efUnitOfWork.SaveChanges();
             
         }
 
         public void Delete(User user)
         {
             efUnitOfWork.GetRepository<User>().Delete(user);
-            
+            efUnitOfWork.SaveChanges();
         }
 
         public List<User> GetAll()
         {
-            return _repository.getAll();
+            return efUnitOfWork.GetRepository<User>().GetAll();
         }
 
         public User GetById(int id)
         {
-            return _repository.Get(x => x.Id == id);
+            return efUnitOfWork.GetRepository<User>().Get(x => x.Id == id);
         }
 
         public User GetByUsername(string username)
         {
-            return _repository.Get(x => x.Username == username);
+            return efUnitOfWork.GetRepository<User>().Get(x => x.Username == username);
         }
 
         public void Update(User user)
         {
             efUnitOfWork.GetRepository<User>().Update(user);
-            
+            efUnitOfWork.SaveChanges();
         }
 
         public void TestUow()
@@ -64,10 +65,9 @@ namespace Business.Concrete
             user2.Name = "ccvdad";
             user2.Id = 1;
 
-            this.Add(user1);
-            this.Add(user2);
+            efUnitOfWork.GetRepository<User>().Add(user1);
+            efUnitOfWork.GetRepository<User>().Add(user2);
             efUnitOfWork.SaveChanges();
-            
         }
     }
 }

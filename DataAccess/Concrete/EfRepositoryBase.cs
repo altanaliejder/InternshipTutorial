@@ -41,7 +41,7 @@ namespace DataAccess.Concrete
             return _context.Set<TEntity>().SingleOrDefault(filter);
         }
 
-        public List<TEntity> getAll(Expression<Func<TEntity, bool>> filter = null)
+        public List<TEntity> GetAll(Expression<Func<TEntity, bool>> filter = null)
         {
 
             return filter == null
