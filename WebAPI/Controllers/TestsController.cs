@@ -1,5 +1,8 @@
-﻿using Business.Abstract;
+﻿using Autofac;
+using Business.Abstract;
+using Business.Attribute;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,7 +23,9 @@ namespace WebAPI.Controllers
         {
             _testService = testService;
             _userBusiness = userBusiness;
+
         }
+
 
         [HttpGet("gettestmethod")]
         public string GetTestMethod()
@@ -35,10 +40,10 @@ namespace WebAPI.Controllers
             return _testService.HelloWorld();
         }
 
-        [HttpGet("getbyusername")]
-        public IActionResult GetByUsername(string username)
+        [HttpGet("getbymail")]
+        public IActionResult GetByMail(string username)
         {
-            var result = _userBusiness.GetByUsername(username);
+            var result = _userBusiness.GetByMail(username);
             if (result != null)
             {
                 return Ok(result);
@@ -51,6 +56,7 @@ namespace WebAPI.Controllers
         [HttpPost("adduser")]
         public IActionResult AddUser(User user)
         {
+            
             _userBusiness.Add(user);
             return Ok();
         }
@@ -61,6 +67,14 @@ namespace WebAPI.Controllers
         {
             _userBusiness.TestUow();
             return Ok();
+        }
+
+        [Authorize]
+        [AuthorizeOperation("admin")]
+        [HttpGet("getall")]
+        public IActionResult GetAll()
+        {
+            return Ok(_userBusiness.GetAll());
         }
     }
 }

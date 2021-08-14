@@ -11,10 +11,11 @@ namespace Business.Abstract
     {
         List<User> GetAll();
         User GetById(int id);
-        User GetByUsername(string username);
+        User GetByMail(string mail);
         void Add(User user);
         void Update(User user);
         void Delete(User user);
-         void TestUow();
+        void TestUow();
+        List<OperationClaim> GetClaims(User user);
     }
 }

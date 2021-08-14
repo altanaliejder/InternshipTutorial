@@ -16,5 +16,7 @@ namespace DataAccess.Concrete
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<OperationClaim> OperationClaim { get; set; }
+        public DbSet<UserOperationClaim> UserOperationClaim { get; set; }
     }
 }

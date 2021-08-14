@@ -27,7 +27,6 @@ namespace Business.Concrete
         {
             efUnitOfWork.GetRepository<User>().Add(user);
             efUnitOfWork.SaveChanges();
-            
         }
 
         public void Delete(User user)
@@ -46,9 +45,9 @@ namespace Business.Concrete
             return efUnitOfWork.GetRepository<User>().Get(x => x.Id == id);
         }
 
-        public User GetByUsername(string username)
+        public User GetByMail(string mail)
         {
-            return efUnitOfWork.GetRepository<User>().Get(x => x.Username == username);
+            return efUnitOfWork.GetRepository<User>().Get(x => x.Email == mail);
         }
 
         public void Update(User user)
@@ -68,6 +67,16 @@ namespace Business.Concrete
             efUnitOfWork.GetRepository<User>().Add(user1);
             efUnitOfWork.GetRepository<User>().Add(user2);
             efUnitOfWork.SaveChanges();
+        }
+
+        public List<OperationClaim> GetClaims(User user)
+        {
+            var result = from operationClaim in _context.OperationClaim
+                         join userOperationClaim in _context.UserOperationClaim
+                         on operationClaim.Id equals userOperationClaim.OperationClaimId
+                         where userOperationClaim.UserId == user.Id
+                         select new OperationClaim { Id = operationClaim.Id, Name = operationClaim.Name };
+            return result.ToList();
         }
     }
 }
