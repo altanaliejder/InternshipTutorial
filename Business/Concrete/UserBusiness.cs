@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.Attribute;
 using DataAccess.Abstract;
 using DataAccess.Concrete;
 using DataAccess.UnitOfWork;
@@ -25,34 +26,35 @@ namespace Business.Concrete
         }
         public void Add(User user)
         {
-            efUnitOfWork.GetRepository<User>().Add(user);
+            _repository.Add(user);
             efUnitOfWork.SaveChanges();
         }
 
         public void Delete(User user)
         {
-            efUnitOfWork.GetRepository<User>().Delete(user);
+            _repository.Delete(user);
             efUnitOfWork.SaveChanges();
         }
 
+        [AuthorizeOperation("admin,moderator")]
         public List<User> GetAll()
         {
-            return efUnitOfWork.GetRepository<User>().GetAll();
+            return _repository.GetAll();
         }
 
         public User GetById(int id)
         {
-            return efUnitOfWork.GetRepository<User>().Get(x => x.Id == id);
+            return _repository.Get(x=>x.Id==id);
         }
 
         public User GetByMail(string mail)
         {
-            return efUnitOfWork.GetRepository<User>().Get(x => x.Email == mail);
+            return _repository.Get(x=>x.Email==mail);
         }
 
         public void Update(User user)
         {
-            efUnitOfWork.GetRepository<User>().Update(user);
+            _repository.Update(user);
             efUnitOfWork.SaveChanges();
         }
 
@@ -64,8 +66,8 @@ namespace Business.Concrete
             user2.Name = "ccvdad";
             user2.Id = 1;
 
-            efUnitOfWork.GetRepository<User>().Add(user1);
-            efUnitOfWork.GetRepository<User>().Add(user2);
+            _repository.Add(user2);
+            _repository.Add(user1);
             efUnitOfWork.SaveChanges();
         }
 

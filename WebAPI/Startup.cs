@@ -39,12 +39,12 @@ namespace WebAPI
         {
 
             services.AddControllers();
-            services.AddScoped<IUserBusiness, UserBusiness>();
-            services.AddScoped<ITestService, TestManager >();
-            services.AddScoped<IRepository<User>, EfRepositoryBase<User>>();
-            services.AddScoped<IAuthService, AuthManager>();
-            services.AddScoped<ITokenHelper, JwtHelper>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddScoped<IUserBusiness, UserBusiness>();
+            //services.AddScoped<ITestService, TestManager >();
+            //services.AddScoped<IRepository<User>, EfRepositoryBase<User>>();
+            //services.AddScoped<IAuthService, AuthManager>();
+            //services.AddScoped<ITokenHelper, JwtHelper>();
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddEntityFrameworkNpgsql().AddDbContext<TestContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MyConnection")));
 
             services.AddSwaggerGen(c =>

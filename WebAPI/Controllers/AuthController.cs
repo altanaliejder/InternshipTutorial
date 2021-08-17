@@ -52,11 +52,11 @@ namespace WebAPI.Controllers
             }
 
             var registerResult = _authService.Register(user);
-            var result = _authService.CreateAccessToken(user);
+            //var result = _authService.CreateAccessToken(user);
 
-            if (result!=null)
+            if (registerResult )
             {
-                return Ok(result.Token);
+                return Ok(registerResult);
             }
             return BadRequest("Register hata");
         }

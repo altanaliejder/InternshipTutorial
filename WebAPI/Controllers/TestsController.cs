@@ -69,8 +69,8 @@ namespace WebAPI.Controllers
             return Ok();
         }
 
-        [Authorize]
-        [AuthorizeOperation("admin")]
+        //[Authorize]
+        
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
