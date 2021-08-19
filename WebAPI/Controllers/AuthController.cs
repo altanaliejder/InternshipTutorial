@@ -1,4 +1,5 @@
-﻿using Business.Abstract;
+﻿using Autofac;
+using Business.Abstract;
 using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,17 +12,15 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
 
         IAuthService _authService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(ILifetimeScope currentContainer):base(currentContainer)
         {
-            _authService = authService;
+            
         }
-
-
 
         [HttpPost("login")]
         public IActionResult Login(User user)
@@ -31,7 +30,6 @@ namespace WebAPI.Controllers
             {
                 return BadRequest("Loginde hata");
             }
-
             var result = _authService.CreateAccessToken(user);
             if (result != null)
             {
@@ -45,6 +43,7 @@ namespace WebAPI.Controllers
         [HttpPost("register")]
         public IActionResult Register(User user)
         {
+           var result= this.currentContainer.Resolve<IUserBusiness>();
             var registeredUser = _authService.UserExist(user.Email);
             if (registeredUser)
             {

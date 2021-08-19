@@ -1,4 +1,5 @@
-﻿using Business.Abstract;
+﻿using Autofac;
+using Business.Abstract;
 using Business.Attribute;
 using DataAccess.Abstract;
 using DataAccess.Concrete;
@@ -12,50 +13,50 @@ using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
-    public class UserBusiness : IUserBusiness
+    public class UserBusiness : BaseBusiness,IUserBusiness
     {
-        IRepository<User> _repository;
-        EfUnitOfWork efUnitOfWork;
-        TestContext _context;
+        //IRepository<User> _repository;
+        //EfUnitOfWork efUnitOfWork;
+        //TestContext _context;
 
-        public UserBusiness(IRepository<User> repository, TestContext context)
+        public UserBusiness(ILifetimeScope currentContainer):base(currentContainer)
         {
-            _repository = repository;
-            _context = context;
-            efUnitOfWork = new EfUnitOfWork(_context);
+            //_repository = repository;
+            //_context = context;
+            //efUnitOfWork = new EfUnitOfWork(_context);
         }
         public void Add(User user)
         {
-            _repository.Add(user);
-            efUnitOfWork.SaveChanges();
+            this.currentContainer.Resolve<IRepository<User>>().Add(user);
+            this.currentContainer.Resolve<IUnitOfWork>().SaveChanges();
         }
 
         public void Delete(User user)
         {
-            _repository.Delete(user);
-            efUnitOfWork.SaveChanges();
+            this.currentContainer.Resolve<IRepository<User>>().Delete(user);
+            this.currentContainer.Resolve<IUnitOfWork>().SaveChanges();
         }
 
         [AuthorizeOperation("admin,moderator")]
         public List<User> GetAll()
         {
-            return _repository.GetAll();
+            return this.currentContainer.Resolve<IRepository<User>>().GetAll();
         }
 
         public User GetById(int id)
         {
-            return _repository.Get(x=>x.Id==id);
+            return this.currentContainer.Resolve<IRepository<User>>().Get(x => x.Id == id);
         }
 
         public User GetByMail(string mail)
         {
-            return _repository.Get(x=>x.Email==mail);
+            return this.currentContainer.Resolve<IRepository<User>>().Get(x => x.Email == mail);
         }
 
         public void Update(User user)
         {
-            _repository.Update(user);
-            efUnitOfWork.SaveChanges();
+            this.currentContainer.Resolve<IRepository<User>>().Update(user);
+            this.currentContainer.Resolve<IUnitOfWork>().SaveChanges();
         }
 
         public void TestUow()
@@ -66,15 +67,16 @@ namespace Business.Concrete
             user2.Name = "ccvdad";
             user2.Id = 1;
 
-            _repository.Add(user2);
-            _repository.Add(user1);
-            efUnitOfWork.SaveChanges();
+            this.currentContainer.Resolve<IRepository<User>>().Add(user1);
+            this.currentContainer.Resolve<IRepository<User>>().Add(user2);
+            this.currentContainer.Resolve<IUnitOfWork>().SaveChanges();
         }
 
         public List<OperationClaim> GetClaims(User user)
         {
-            var result = from operationClaim in _context.OperationClaim
-                         join userOperationClaim in _context.UserOperationClaim
+            var context = this.currentContainer.Resolve<TestContext>();
+            var result = from operationClaim in context.OperationClaim
+                         join userOperationClaim in context.UserOperationClaim
                          on operationClaim.Id equals userOperationClaim.OperationClaimId
                          where userOperationClaim.UserId == user.Id
                          select new OperationClaim { Id = operationClaim.Id, Name = operationClaim.Name };

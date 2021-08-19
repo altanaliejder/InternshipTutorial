@@ -1,4 +1,5 @@
-﻿using Business.Abstract;
+﻿using Autofac;
+using Business.Abstract;
 using Business.Jwt;
 using Entities;
 using System;
@@ -6,34 +7,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dtos;
 
 namespace Business.Concrete
 {
-    public class AuthManager : IAuthService
+    public class AuthManager : BaseBusiness,IAuthService
     {
-        IUserBusiness _userBusiness;
-        ITokenHelper _tokenHelper;
+        //IUserBusiness _userBusiness;
+        //ITokenHelper _tokenHelper;
 
-        public AuthManager(IUserBusiness userBusiness, ITokenHelper tokenHelper)
+        public AuthManager(ILifetimeScope currentContainer):base(currentContainer)
         {
-            _userBusiness = userBusiness;
-            _tokenHelper = tokenHelper;
+            //_userBusiness = userBusiness;
+            //_tokenHelper = tokenHelper;
         }
 
         public AccessToken CreateAccessToken(User user)
         {
-            var claims = _userBusiness.GetClaims(user);
-            return _tokenHelper.CreateToken(user,claims);
+            var tokenHelper= this.currentContainer.Resolve<ITokenHelper>();
+            var userBusiness = this.currentContainer.Resolve<IUserBusiness>();
+            var claims = userBusiness.GetClaims(user);
+            return tokenHelper.CreateToken(user, claims);
         }
 
         public bool Login(User user)
         {
-            var registeredUser = _userBusiness.GetByMail(user.Email);
+            var loginUser=this.currentContainer.Resolve<IMapper>().Map<UserForLogin>(user);
+            var registeredUser = this.currentContainer.Resolve<IUserBusiness>().GetByMail(loginUser.Email);
             if (registeredUser==null)
             {
                 return false;
             }
-            else if (registeredUser.Password != user.Password)
+            else if (registeredUser.Password != loginUser.Password)
             {
                 return false;
             }
@@ -45,14 +51,15 @@ namespace Business.Concrete
 
         public bool Register(User user)
         {
-            _userBusiness.Add(user);
+            var registerUser = this.currentContainer.Resolve<IMapper>().Map<UserForRegister>(user);
+            this.currentContainer.Resolve<IUserBusiness>().Add(registerUser);
             return true;
 
         }
 
-        public bool UserExist(string username)
+        public bool UserExist(string mail)
         {
-            if (_userBusiness.GetByMail(username) != null)
+            if (this.currentContainer.Resolve<IUserBusiness>().GetByMail(mail)!= null)
             {
                 return true;
             }
